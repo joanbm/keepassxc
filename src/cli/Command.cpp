@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config-keepassx.h"
 #include "Add.h"
 #include "AddGroup.h"
 #include "Analyze.h"
@@ -43,6 +44,9 @@
 #include "Search.h"
 #include "Show.h"
 #include "Utils.h"
+#ifdef WITH_XC_SSHAGENT
+#include "SSHAgentPopulate.h"
+#endif
 
 #include <QCommandLineParser>
 #include <QFileInfo>
@@ -190,6 +194,9 @@ namespace Commands
         s_commands.insert(QStringLiteral("rmdir"), QSharedPointer<Command>(new RemoveGroup()));
         s_commands.insert(QStringLiteral("search"), QSharedPointer<Command>(new Search()));
         s_commands.insert(QStringLiteral("show"), QSharedPointer<Command>(new Show()));
+#ifdef WITH_XC_SSHAGENT
+        s_commands.insert(QStringLiteral("ssh-agent-populate"), QSharedPointer<Command>(new SSHAgentPopulate()));
+#endif
 
         if (interactive) {
             s_commands.insert(QStringLiteral("exit"), QSharedPointer<Command>(new Exit("exit")));

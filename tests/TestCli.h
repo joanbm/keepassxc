@@ -18,6 +18,8 @@
 #ifndef KEEPASSXC_TESTCLI_H
 #define KEEPASSXC_TESTCLI_H
 
+#include "config-keepassx.h"
+
 #include <QBuffer>
 
 #include "util/TemporaryFile.h"
@@ -81,6 +83,9 @@ private slots:
     void testInvalidDbFiles();
     void testYubiKeyOption();
     void testNonAscii();
+#ifdef WITH_XC_SSHAGENT
+    void testSshAgentPopulate();
+#endif
 
 private:
     QScopedPointer<QFile> m_devNull;

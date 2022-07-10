@@ -52,6 +52,9 @@
 #include "cli/RemoveGroup.h"
 #include "cli/Search.h"
 #include "cli/Show.h"
+#ifdef WITH_XC_SSHAGENT
+#include "cli/SSHAgentPopulate.h"
+#endif
 #include "cli/Utils.h"
 
 #include <QClipboard>
@@ -246,7 +249,12 @@ void TestCli::testBatchCommands()
     QVERIFY(Commands::getCommand("show"));
     QVERIFY(Commands::getCommand("search"));
     QVERIFY(!Commands::getCommand("doesnotexist"));
+#ifdef WITH_XC_SSHAGENT
+    QVERIFY(Commands::getCommand("ssh-agent-populate"));
+    QCOMPARE(Commands::getCommands().size(), 27);
+#else
     QCOMPARE(Commands::getCommands().size(), 26);
+#endif
 }
 
 void TestCli::testInteractiveCommands()
@@ -278,7 +286,12 @@ void TestCli::testInteractiveCommands()
     QVERIFY(Commands::getCommand("show"));
     QVERIFY(Commands::getCommand("search"));
     QVERIFY(!Commands::getCommand("doesnotexist"));
+#ifdef WITH_XC_SSHAGENT
+    QVERIFY(Commands::getCommand("ssh-agent-populate"));
+    QCOMPARE(Commands::getCommands().size(), 27);
+#else
     QCOMPARE(Commands::getCommands().size(), 26);
+#endif
 }
 
 void TestCli::testAdd()
@@ -2341,6 +2354,25 @@ void TestCli::testNonAscii()
     QCOMPARE(QString::fromUtf8(password).trimmed(),
              QString::fromUtf8("\xf0\x9f\x9a\x97\xf0\x9f\x90\x8e\xf0\x9f\x94\x8b\xf0\x9f\x93\x8e"));
 }
+
+#ifdef WITH_XC_SSHAGENT
+void TestCli::testSshAgentPopulate()
+{
+    SSHAgentPopulate sshAgentPopulateCmd;
+    QVERIFY(!sshAgentPopulateCmd.name.isEmpty());
+    QVERIFY(sshAgentPopulateCmd.getDescriptionLine().contains(sshAgentPopulateCmd.name));
+
+    config()->set(Config::SSHAgent_Enabled, 0);
+
+    setInput("a");
+    execCmd(sshAgentPopulateCmd, {"ssh-agent-populate", m_dbFile->fileName()});
+    m_stderr->readLine(); // Skip password prompt
+    QCOMPARE(m_stderr->readAll(), QByteArray("The SSH agent is not enabled.\n"));
+    QCOMPARE(m_stdout->readAll(), QByteArray(""));
+
+    // TODO: Can we test the command functionality here? E.g. with mocks to the SSH agent?
+}
+#endif
 
 void TestCli::testCommandParsing_data()
 {

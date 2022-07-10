@@ -147,6 +147,10 @@ It provides the ability to query and modify the entries of a KeePass database, d
   Can also show the current TOTP.
   Regarding the occurrence of multiple entries with the same name in different groups, everything stated in the *clip* command section also applies here.
 
+*ssh-agent-populate* <__database__> [_entry_]::
+  Adds keys to the SSH Agent, and removes them when a quit signal is received.
+  If no entry is specified, defaults to adding all keys specified to load on database open.
+
 == OPTIONS
 === General options
 *--debug-info*::
